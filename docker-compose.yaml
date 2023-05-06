@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  mysqlDB:
+    container_name: mysqlDB
+    image: mysql:8
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: mutant
+    volumes:
+      - data-mysql:/var/lib/mysql
+    restart: always
+    networks:
+      - spring
+
+  reto:
+    container_name: reto
+    image: software1080/reto
+    ports:
+      - "8003:8003"
+    environment:
+      PORT: 8003
+      DB_HOST: mysqlDB:3306
+      DB_DATABASE: mutant
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+    networks:
+      - spring
+    depends_on:
+      - mysqlDB
+    restart: always
+
+volumes:
+  data-mysql:
+
+networks:
+  spring:
+    name: spring
