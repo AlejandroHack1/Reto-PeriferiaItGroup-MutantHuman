@@ -13,7 +13,16 @@ public class Mutant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Transient
     private String[] dna;
+
+    public Mutant() {
+    }
+
+    public Mutant(Long id, String[] dna) {
+        this.id = id;
+        this.dna = dna;
+    }
 
     public Long getId() {
         return id;

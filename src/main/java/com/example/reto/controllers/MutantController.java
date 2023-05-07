@@ -37,10 +37,21 @@ public class MutantController {
 
         Stats stats = new Stats();
 
+
         if(result.hasErrors()){
             return validar(result);
         }
 
+
+        //si Ingresa un Array muy Corto
+        if(!checkLenghtArray(mutant.getDna())){
+            return ResponseEntity.badRequest().body(Collections.singletonMap("mensaje","Estructura DNA es muy corta"));
+        }
+
+        //si Ingresa una estructura incorrecta NxN
+        if(!checkArrayTable(mutant.getDna())){
+            return ResponseEntity.badRequest().body(Collections.singletonMap("mensaje","Estructura DNA NxN Tabla, Incorrecta"));
+        }
 
         if(mutant.getDna().length != 0 && service.porDna(mutant.getDna()).isPresent()){
             return ResponseEntity.badRequest().body(Collections.singletonMap("mensaje","Ya está registrado ese ADN"));
@@ -66,9 +77,6 @@ public class MutantController {
                         float mutante = service.getCount_mutant_dna() + 1;
                         float human = service.getCount_human_dna();
                         stats.setRatio(mutante/human);
-
-                        //System.out.println(mutante / human);
-
                     }
                 }
 
@@ -108,10 +116,24 @@ public class MutantController {
 
     private ResponseEntity<Map<String, String>> validar(BindingResult result) {
         Map<String, String> errores = new HashMap<>();
-        result.getFieldErrors().forEach(err -> {
-            errores.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage());
-        });
+        result.getFieldErrors().forEach(err -> errores.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage()));
         return ResponseEntity.badRequest().body(errores);
+    }
+
+    public static boolean checkLenghtArray(String[] array) {
+        return array.length > 3;
+    }
+
+    public static boolean checkArrayTable(String[] array) {
+
+        for (String dna1 : array) {
+            boolean b = dna1.length() != array.length;
+            if(b){
+                return false;
+            }
+
+        }
+        return true;
     }
 
     //verifica letras correctas de los nucleotides
@@ -126,7 +148,7 @@ public class MutantController {
         return true;
     }
 
-    private static boolean isMutant(String[] dna) {
+    public static boolean isMutant(String[] dna) {
         int size = dna.length;
         int count = 0;
 
